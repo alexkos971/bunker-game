@@ -1,15 +1,15 @@
-const http = require('http');
+// const http = require('http');
 const TelegramBot = require("node-telegram-bot-api");
 const fs = require('fs');
 
 const token = "1802821128:AAHTsDcqYisWhwyzXnnaNO04_5zCnFwyXCU";
-const port = 8000 || process.env.port;
+const port = 443 || process.env.port;
 // const host = 'localhost';
 
-const server = http.createServer((req, res) => {
-    res.write("server!!!");
-    res.end();
-}).listen(port);
+// const server = http.createServer((req, res) => {
+//     res.write("server!!!");
+//     res.end();
+// }).listen(port);
 
 const options = {
     webHook: {
