@@ -16,7 +16,7 @@ const options = {
       port: port
     }
 }
-const url = process.env.APP_URL || 'https://cyber-bunker.herokuapp.com:8443';
+const url = 'https://cyber-bunker.herokuapp.com:88';
 const bot = new TelegramBot(token, options);
 
 bot.setWebHook(`${url}/bot${token}`);
