@@ -23,9 +23,6 @@ const bot = new TelegramBot(token, options);
 bot.setWebHook(`${url}/bot${token}`);
 // bot.setWebHook(`http://localhost:8000/bot${token}`)
 
-server.listen(port, () => {
-    res.end('server is worked')
-})
 
 let rooms = [];
 let state = '';
