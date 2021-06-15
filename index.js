@@ -11,15 +11,15 @@ const port = process.env.port || 8443;
 //     res.end();
 // }).listen(port);
 
-const options = {
-    webHook: {
-      port: port
-    }
-}
-const url = 'https://cyber-bunker.herokuapp.com:88';
-const bot = new TelegramBot(token, options);
+// const options = {
+//     webHook: {
+//       port: port
+//     }
+// }
+const url = 'https://cyber-bunker.herokuapp.com:443';
+const bot = new TelegramBot(token, {polling: true});
 
-bot.setWebHook(`${url}/bot${token}`);
+// bot.setWebHook(`${url}/bot${token}`);
 // bot.setWebHook(`http://localhost:8000/bot${token}`)
 
 
