@@ -16,24 +16,13 @@ const server = http.createServer((req, res) => {
 // }
 // const url = 'https://cyber-bunker.herokuapp.com:443';
 const bot = new TelegramBot(token, {polling: true});
-
 // bot.setWebHook(`${url}/bot${token}`);
+
 
 
 let rooms = [];
 let state = '';
 const access = [];
-
-// let rooms = {
-//     code: {
-//         players: [
-//             player: {
-//                 id: ''
-//                 card: ''
-//             }
-//         ]
-//     }
-// }
 
 // let rooms = [
 //     {
@@ -50,11 +39,6 @@ const access = [];
 //     }
 // ]
 
-// Object.defineProperty(rooms, {
-//     set (target, prop, val) {
-
-//     }
-// })
 
 const generateCode = () => {
     var text = "";
