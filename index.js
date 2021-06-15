@@ -17,7 +17,7 @@ const options = {
     }
 }
 const url = process.env.APP_URL || 'https://cyber-bunker.herokuapp.com:443';
-const bot = new TelegramBot(token, {polling: true});
+const bot = new TelegramBot(token, options);
 
 bot.setWebHook(`${url}/bot${token}`);
 // bot.setWebHook(`http://localhost:8000/bot${token}`)
