@@ -19,13 +19,13 @@ const options = {
       }
 }
 const url = process.env.APP_URL || 'https://cyberbunker.herokuapp.com:443';
-const bot = new TelegramBot(token, options);
+const bot = new TelegramBot(token, { polling: true });
 
-bot.setWebHook(`${url}/bot${token}`);
+// bot.setWebHook(`${url}/bot${token}`);
 // bot.setWebHook(`http://localhost:8000/bot${token}`)
 
 
-let rooms = [];
+let rooms = {}
 let state = '';
 const access = [];
 
@@ -72,7 +72,7 @@ const generateCode = () => {
 }
 
 
-bot.on('message', async (msg) => {
+bot.on('message', (msg) => {
     switch(state) {
         case 'create':
             console.log('create');
@@ -83,60 +83,48 @@ bot.on('message', async (msg) => {
                 }
                 else {
                     let code = String(generateCode());
-                    let disaster = await getDisaster();
-
-                    rooms.push({
-                        id: code,
+                    
+                    rooms[code] = {
                         length: count,
                         players: [],
-                        disaster: disaster,
-                        admin: String(msg.from.id)
-                    })
-                    // [code] = {
-                    //     length: count,
-                    //     players: [],
-                    //     admin: msg.from.id
-                    // };
+                        admin: msg.from.id
+                    };
                     
                     bot.sendMessage(msg.from.id, `Комната на ${count} человек созданна, код - ${code}`);
                     bot.sendMessage(msg.from.id, `Чтобы начать игру отправьте /play`);
-
                     access.push(String(msg.from.id));
                     console.log(access);
-                    // (async () => {
-                    //     await getDisaster(code);
-                    // })();
+                    (async () => {
+                        await getDisaster(code);
+                    })();
                 }
                 state = '';
                 break;
                 
         case "join":
             console.log('join');
-            let enterCode = await String(msg.text);
+            let enterCode = String(msg.text);
             
-            let check = await rooms.find(e => e.id === enterCode);
-            
-            if (check !== undefined && check.length > 0) {
-                if (check.players.length >= check.length) {
+            if (rooms.hasOwnProperty(enterCode) && rooms[enterCode].players.length >= rooms[enterCode].length) {
                     bot.sendMessage(msg.from.id, "Слишком много человек");
-                    return;
-                }
-                if (check.players.find(e => e.id === msg.from.id)) {
+                return;
+            }
+    
+            if (!rooms.hasOwnProperty(enterCode)) {
+                bot.sendMessage(msg.from.id, "Неверный код");
+                return;
+            }
+        
+            if (rooms.hasOwnProperty(enterCode)) {
+                if (rooms[enterCode].players.includes(msg.from.id)) {
                     bot.sendMessage(msg.from.id, "Вы уже добавлены");
                     return;
                 }
                 else {
-                    check.players.push({"id": msg.from.id, "card": "", "username": msg.from.username});
+                    rooms[enterCode].players.push({"id": msg.from.id, "card": ""});
                     bot.sendMessage(msg.from.id, `Вы добавлены в комнату`);
-                    bot.sendMessage(check.admin, `Пользователь @${msg.from.username} подключился`)
-                    state = '';
                 }
-            }
-            else {
-                bot.sendMessage(msg.from.id, "Неверный код");
-                return;
-            }
-    
+            }  
             state = '';
             break;   
 
@@ -171,11 +159,13 @@ bot.on('callback_query', async (query) => {
 
 
 // Send Disaster
-const getDisaster = async () => {
+const getDisaster = async (room) => {
+    // console.log(rooms[room])
     const disasters = JSON.parse(fs.readFileSync('./disasters.json'));
     let newDisaster = '';
 
-    await Object.keys(disasters).forEach(item => {
+    await Object.keys(disasters).forEach((item, index) => {
+        // console.log(item)
         let random = Math.floor(Math.random() * disasters[item].length);
 
         // let variable = [3, 4, 5]
@@ -190,22 +180,22 @@ const getDisaster = async () => {
 
         newDisaster += item + ' - ' + (disasters[item][random]).toLowerCase() + "\n\n";
     });
-    return newDisaster;
+    return rooms[room].disaster = newDisaster;
 }
 
-// const check = (prop) => {
-//     Object.keys(rooms).forEach(item => {
-//         if (rooms[item] == prop) {
-//             return true;
-//         }
-//         else {
-//             return false;
-//         }
-//     })
-// }
+const check = (prop) => {
+    Object.keys(rooms).forEach(item => {
+        if (rooms[item] == prop) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    })
+}
 
 // Send Cards
-const getCard = async (player) => {
+const getCard =  async (player) => {
 
     const data = JSON.parse(fs.readFileSync('./data.json'));
     let card = '';
@@ -235,20 +225,29 @@ const sendAll = async (room) => {
     return;
 }
 
-const deleteRoom = (id) => {
+const deleteRoom = async (msg) => {
+    let room;
 
-    rooms.map(async (item, index) => {
-        console.log(item.admin, id)
-        if (item.admin == id) {
-            await rooms.splice(index, 1);
-            bot.sendMessage(id, "Комната удалена");
-        }
-        else {
-            bot.sendMessage(id, 'Вы не админ');
+    await Object.keys(rooms).map(item => {
+        console.log(item, msg.from.id)
+        if (rooms[item].admin == msg.from.id) {
+            return room = rooms[item];
         }
         return;
     })
 
+    if (room) {
+
+        await room.players.forEach(item => {
+            bot.sendMessage(item.id, "Комната удалена");
+        })
+        await delete room;
+        return room;
+    }
+    else {
+        bot.sendMessage(msg.from.id, 'Вы не админ');
+        console.log('delte')
+    }
 }
 
 
@@ -285,27 +284,7 @@ bot.onText(/\/(.+)/, async (msg, match) => {
         
         case 'end':
             console.log("delete");
-            await deleteRoom(msg.from.id);
-            // await access.
-            let elem = access.indexOf(msg.from.id);
-            access.splice(elem, 1);
-            break;
-            
-        case "polls":
-            let check = await rooms.find(e => e.admin == msg.from.id);
-
-            if (check && check.length >= 2) {
-                let players = [];
-                await check.players.forEach(item => {
-                    players.push(`@${item.username}`);
-                })
-                console.log(players);
-                bot.sendPoll(msg.from.id, 'Кого ?', players)
-            }
-            else {
-                console.log('Не хватает человек для опроса')
-                return;
-            }
+            await deleteRoom(msg);
             break;
             
         default: return;
