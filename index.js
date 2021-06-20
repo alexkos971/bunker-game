@@ -3,7 +3,7 @@ const TelegramBot = require("node-telegram-bot-api");
 const fs = require('fs');
 
 const token = "1802821128:AAHTsDcqYisWhwyzXnnaNO04_5zCnFwyXCU";
-const port = process.env.port || 3000;
+const port = process.env.port || 5000;
 
 const server = http.createServer((req, res) => {
     res.end('server worked');
@@ -242,7 +242,9 @@ bot.onText(/\/(.+)/, async (msg, match) => {
                     inline_keyboard: [
                         [{ text: 'Создать комнату', callback_data: 'create' }],
                         [{ text: 'Войти в комнату', callback_data: 'join' }]
-                    ]
+                    ],
+                    // resize_keyboard: true,
+                    // one_time_keyboard: true
                 })
             }
             bot.sendMessage(msg.from.id, "Выберите пункт:", buttons); 
@@ -279,14 +281,26 @@ bot.onText(/\/(.+)/, async (msg, match) => {
                     players.push(`@${item.username}`);
                 })
                 console.log(players);
-                bot.sendPoll(msg.from.id, 'Кого ?', players)
+                bot.sendPoll(msg.chat.id, 'Кого ?', players)
             }
             else {
                 console.log('Не хватает человек для опроса')
                 return;
             }
             break;
-            
+        
+        case 'photo':
+            // let photos = [];
+            // const photo = `${__dirname}/Logo.png`;
+            // for(let i = 0; i < 6; i++) {
+            //     await photos.push({media: photo, type: 'photo'})
+            // }
+            // bot.sendMediaGroup(msg.from.id, photos);
+
+            // let photos = `${__dirname}/biological`;
+              bot.getFile(msg.document.file_id).then((resp) => {
+             console.log(resp)
+         })
         default: return;
         }  
     });
@@ -317,4 +331,3 @@ bot.onText(/\/check/, (msg) => {
 
 // pooling errors
 bot.on("polling_error", console.log);
-
