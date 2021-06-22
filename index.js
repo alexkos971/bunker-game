@@ -1,15 +1,13 @@
 const TelegramBot = require("node-telegram-bot-api");
 const fs = require('fs');
 
-const token = "1802821128:AAHTsDcqYisWhwyzXnnaNO04_5zCnFwyXCU";
+const token = process.env.TELEGRAM_TOKEN || "1802821128:AAHTsDcqYisWhwyzXnnaNO04_5zCnFwyXCU";
 
 let port = process.env.PORT || 443,
-    host = '0.0.0.0',  // probably this change is not required
-    externalUrl = process.env.CUSTOM_ENV_VARIABLE || 'https://my-app.herokuapp.com',
-    token = process.env.TOKEN || token,
-    bot = new TelegramBot(process.env.TOKEN, { webHook: { port : port, host : host } });
-bot.setWebHook(externalUrl + ':443/bot' + token);
+    url = process.env.url || 'https://cyber-bunker.herokuapp.com:443',
+    bot = new TelegramBot(token, {polling: true});
 
+// bot.setWebHook(`${url}/bot${token}`);
 
 
 let rooms = [];
