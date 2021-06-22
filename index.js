@@ -2,7 +2,7 @@ const TelegramBot = require("node-telegram-bot-api");
 const fs = require('fs');
 
 const token = "1802821128:AAHTsDcqYisWhwyzXnnaNO04_5zCnFwyXCU";
-const port = process.env.port || 5000;
+const port = process.env.port;
 
 // const server = http.createServer((req, res) => {
 //     res.end('server worked');
@@ -13,7 +13,7 @@ const options = {
       port: port
     }
 }
-const url = 'https://cyber-bunker.herokuapp.com:443';
+const url = `https://cyber-bunker.herokuapp.com:${port}`;
 
 const bot = new TelegramBot(token, options);
 bot.setWebHook(`${url}/bot${token}`);
