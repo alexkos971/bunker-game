@@ -1,24 +1,22 @@
-const http = require('http');
 const TelegramBot = require("node-telegram-bot-api");
 const fs = require('fs');
-const { match } = require('assert');
-const { type } = require('os');
 
 const token = "1802821128:AAHTsDcqYisWhwyzXnnaNO04_5zCnFwyXCU";
 const port = process.env.port || 5000;
 
-const server = http.createServer((req, res) => {
-    res.end('server worked');
-}).listen(port);
+// const server = http.createServer((req, res) => {
+//     res.end('server worked');
+// }).listen(port);
 
-// const options = {
-//     webHook: {
-//       port: port
-//     }
-// }
-// const url = 'https://cyber-bunker.herokuapp.com:443';
-const bot = new TelegramBot(token, {polling: true});
-// bot.setWebHook(`${url}/bot${token}`);
+const options = {
+    webHook: {
+      port: port
+    }
+}
+const url = 'https://cyber-bunker.herokuapp.com:443';
+
+const bot = new TelegramBot(token, options);
+bot.setWebHook(`${url}/bot${token}`);
 
 
 
