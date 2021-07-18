@@ -5,7 +5,7 @@ const token = process.env.TELEGRAM_TOKEN || "1802821128:AAHTsDcqYisWhwyzXnnaNO04
 
 let port = process.env.PORT || 443,
     url = process.env.url || 'https://cyber-bunker.herokuapp.com:443',
-    bot = new TelegramBot(token, {polling: true});
+    bot = new TelegramBot(token, { polling: true});
 
 // bot.setWebHook(`${url}/bot${token}`);
 
